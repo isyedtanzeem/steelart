@@ -123,6 +123,25 @@
     font-size: 16px;
     
   }
+  .invoice-header {
+    margin: 0;
+  }
+  #invoiceNo {
+    width: 170px; /* Adjust the width as needed */
+  }
+  .inline-container {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    gap: 10px; /* Add spacing between the elements */
+  }
+  .invoice-input {
+    margin: 0;
+  }
+  #invoiceNo::placeholder {
+    color: red;
+    font-weight: bold;
+    
+  }
   .button-container{
     display: flex;
     justify-content: center;
@@ -198,6 +217,21 @@
     .submit-button {
       padding: 8px 16px;
       max-width: 100px;
+    }
+    .invoice-header {
+      margin: 0;
+    }
+    #invoiceNo {
+      width: 170px; /* Adjust the width as needed */
+    }
+    
+    .invoice-input {
+      margin: 0;
+    }
+    #invoiceNo::placeholder {
+      color: red;
+      font-weight: bold;
+      
     }
   }
   

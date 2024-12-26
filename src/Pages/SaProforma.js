@@ -9,7 +9,7 @@ import callIcon from "./Images/callicon.png"; // Import your logo image
 import Signature from "./Images/signature.png";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
-const SaQuote = () => {
+const SaProforma = () => {
   const itemFields = Array.from({ length: 20 }, (_, index) => ({
     [`no${index + 1}Rate`]: "",
     [`no${index + 1}Item`]: "",
@@ -115,7 +115,7 @@ const SaQuote = () => {
     pdf.setFontSize(20);
     pdf.setFont(undefined, "bold");
 
-    pdf.text(140, 18, "QUOTATION");
+    pdf.text(140, 18, "Proforma");
 
     // Add a filled rectangular box to the PDF
 
@@ -140,7 +140,7 @@ const SaQuote = () => {
     pdf.text(`DATE: ${currentDate}`, 108, 45.4);
     pdf.rect(107, 41, 90, 7);
     pdf.rect(137, 41, 60, 7);
-    pdf.text(`Quotation No: ${formData.QuotationNo}`, 138, 45.4, { align: "left" });
+    pdf.text(`Proforma No: ${formData.ProformaNo}`, 138, 45.4, { align: "left" });
     pdf.text(`GSTIN: ${formData.gstNo}`, 108, 52.5, { align: "left" });
 
     pdf.rect(107, 48, 90, 7);
@@ -161,7 +161,7 @@ const SaQuote = () => {
     //end of first layer
 
     pdf.setFontSize(12);
-    pdf.setFillColor(217, 0, 0 );
+    pdf.setFillColor(16, 70, 0);
     pdf.rect(12, 66, 185, 7, "F");
 
     pdf.setFont(undefined, "bold");
@@ -612,7 +612,7 @@ pdf.text(`${amount17}`, 184, 190, "right");
     pdf.addImage(Signature, "PNG", 130, 246, 40, 17);
     pdf.setTextColor(0, 0, 0);
     pdf.setFont(undefined, "none");
-    let dateFormat = new Date(formData.dateOfDelivery).toLocaleDateString(
+    let dateFormat = new Date(formData.dateOfProforma).toLocaleDateString(
       "en-GB"
     );
     console.log(dateFormat);
@@ -634,7 +634,7 @@ pdf.text(`${amount17}`, 184, 190, "right");
     // Remove spaces and special characters from name and mobile
     const sanitizedName = formData.name.replace(/[^a-zA-Z0-9]/g, "");
 
-    const pdfName = `Sa_Quotation_${formData.QuotationNo}.pdf`;
+    const pdfName = `Sa_Proforma_${formData.ProformaNo}.pdf`;
     console.log(sanitizedName);
 
     pdf.save(pdfName);
@@ -645,34 +645,34 @@ pdf.text(`${amount17}`, 184, 190, "right");
       {/* <h4><Link to="/">Go to Home</Link></h4> */}
     
       <form onSubmit={handleSubmit}>
-      <h4>Steel Art Quotation</h4>
+      <h4>Steel Art Proforma</h4>
       <div className="inline-container">
-  <div className="Quotation-header">
+  <div className="Proforma-header">
     
   </div>
 
   <div className="form-group">
-  <label>Quotation No</label>
+  <label>Proforma No</label>
     <input
       type="text"
       className="input"
-      id="QuotationNo"
-      placeholder="Quotation Number"
-      name="QuotationNo"
+      id="ProformaNo"
+      placeholder="Proforma Number"
+      name="ProformaNo"
       required
-      value={formData.QuotationNo}
+      value={formData.ProformaNo}
       onChange={handleInputChange}
     />
   </div>
   <div className="form-group">
-            <label>Date of Quotation</label>
+            <label>Date of Proforma</label>
             <input
               className="input margin"
               type="date"
-              id="QuotationDate"
-              placeholder="Quotation Date"
-              name="QuotationDate"
-              value={formData.QuotationDate}
+              id="ProformaDate"
+              placeholder="Proforma Date"
+              name="ProformaDate"
+              value={formData.ProformaDate}
               onChange={handleInputChange}
             />
           </div>
@@ -2049,4 +2049,4 @@ pdf.text(`${amount17}`, 184, 190, "right");
   );
 };
 
-export default SaQuote;
+export default SaProforma;

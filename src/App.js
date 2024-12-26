@@ -6,6 +6,7 @@ import SaQuote from './Pages/SaQuote';
 import Home from './Pages/Home';
 import SaInvoice from './Pages/SaInvoice';
 import SaDelivery from './Pages/SaDelivery';
+import SaProforma from './Pages/SaProforma';
 import Login from './Pages/Login';
 
 function App() {
@@ -16,18 +17,22 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route 
+          {/* <Route 
             path="/" 
             element={isAuthenticated ? <Home /> : <Navigate to="/login" />} 
-          />
+          /> */}
           <Route 
             path="/Saanitation" 
             element={isAuthenticated ? <Home /> : <Navigate to="/login" />} 
           />
           <Route 
+            path="/" 
+            element={ <SaInvoice />} 
+          />
+          {/* <Route 
             path="/SaInvoice" 
             element={isAuthenticated ? <SaInvoice /> : <Navigate to="/login" />} 
-          />
+          /> */}
           <Route 
             path="/SaDelivery" 
             element={isAuthenticated ? <SaDelivery /> : <Navigate to="/login" />} 
@@ -35,6 +40,10 @@ function App() {
           <Route 
             path="/SaQuote" 
             element={isAuthenticated ? <SaQuote /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/SaProforma" 
+            element={isAuthenticated ? <SaProforma /> : <Navigate to="/login" />} 
           />
         </Routes>
       </Router>
