@@ -50,7 +50,7 @@ select {
   box-sizing: border-box;
 }
 
-button {
+.add-button {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -59,6 +59,25 @@ button {
   border-radius: 5px;
   cursor: pointer;
 }
+.remove-button {
+  background-color: #e20000;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.generate-button {
+  background-color: #1d00dc;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 
 button:hover {
   background-color: #45a049;

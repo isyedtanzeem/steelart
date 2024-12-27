@@ -429,20 +429,20 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
               </div>
             </div>
 
-            <button type="button" onClick={() => removeItem(index)}>
+            <button className="remove-button" type="button" onClick={() => removeItem(index)}>
               Remove Item
             </button>
             <hr />
           </div>
         ))}
 
-        <button type="button" onClick={addItem}>
+        <button className="add-button" type="button" onClick={addItem}>
           Add Item
         </button>
         <br />
         <br />
 
-        <button type="submit">Generate Invoice</button>
+        <button className="generate-button" type="submit">Generate Invoice</button>
       </form>
     </div>
   );
