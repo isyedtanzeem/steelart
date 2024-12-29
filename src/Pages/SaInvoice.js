@@ -299,7 +299,7 @@ function InvoiceGenerator() {
     doc.text("Receiver's Signature", 150, doc.lastAutoTable.finalY + 85);
 
     // Saving PDF
-    doc.save("invoice.pdf");
+    doc.save(`SaInvoice-${invoiceNumber}.pdf`);
   };
 
   const handleSubmit = (e) => {
