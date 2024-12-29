@@ -21,18 +21,19 @@ function App() {
             path="/" 
             element={isAuthenticated ? <Home /> : <Navigate to="/login" />} 
           /> */}
-          <Route 
-            path="/Saanitation" 
-            element={isAuthenticated ? <Home /> : <Navigate to="/login" />} 
-          />
+          
           <Route 
             path="/" 
-            element={ <SaInvoice />} 
+            element={ <Home />} 
           />
           {/* <Route 
             path="/SaInvoice" 
             element={isAuthenticated ? <SaInvoice /> : <Navigate to="/login" />} 
           /> */}
+          <Route 
+            path="/SaInvoice" 
+            element= {<SaInvoice /> }
+            />
           <Route 
             path="/SaDelivery" 
             element={isAuthenticated ? <SaDelivery /> : <Navigate to="/login" />} 

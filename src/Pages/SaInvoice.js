@@ -2,14 +2,19 @@ import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import "./Invoice.css";
 import "jspdf-autotable";
-import signature from "./Images/signature.png"
-import logo from "./Images/saLogo.png"
+import signature from "./Images/signature.png";
+import logo from "./Images/saLogo.png";
 
 function InvoiceGenerator() {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [address, setAddress] = useState("");
   const [customerGST, setCustomerGST] = useState("");
+  const [shippedName, setShippedName] = useState("");
+  const [shippedMobile, setShippedMobile] = useState("");
+  const [shippedAddress, setShippedAddress] = useState("");
+  const [shippedGST, setShippedGST] = useState("");
+  
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -21,19 +26,17 @@ function InvoiceGenerator() {
 
   const [invoiceDate, setInvoiceDate] = useState(getCurrentDate()); // Default to today's date
 
- 
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [invoiceNumberError, setInvoiceNumberError] = useState("");
   const [gstType, setGstType] = useState("noGst");
   const [invoiceType, setInvoiceType] = useState("Project");
 
   const [ewayBill, setewayBill] = useState("");
+  const [vehicleNo, setVehicleNo] = useState("");
   const [mobileError, setMobileError] = useState("");
 
   const [items, setItems] = useState([
-    
     { description: "", quantity: 1, rate: 0, amount: 0 },
-     
   ]);
 
   const handleInputChange = (index, e) => {
@@ -49,13 +52,8 @@ function InvoiceGenerator() {
   };
 
   const addItem = () => {
-    setItems([
-      ...items,
-      { description: "", quantity: 1, rate: 0, amount: 0 },
-      
-    ]);
+    setItems([...items, { description: "", quantity: 1, rate: 0, amount: 0 }]);
   };
-  
 
   const removeItem = (index) => {
     const values = [...items];
@@ -75,14 +73,14 @@ function InvoiceGenerator() {
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    doc.addImage(logo, 'PNG', 14, 12, 30, 30);
+    doc.addImage(logo, "PNG", 14, 12, 30, 30);
 
     doc.setFontSize(50);
-    doc.setTextColor(0, 74, 173);
+    doc.setTextColor(237, 104, 2);
     doc.setFont("helvetica", "bold");
     doc.text("STEEL ART", 64, 28); // Company Name
     doc.setTextColor(0, 0, 0);
-    doc.setFont("calibri","none");
+    doc.setFont("calibri", "none");
 
     doc.setFontSize(10);
     doc.text(
@@ -92,27 +90,50 @@ function InvoiceGenerator() {
     ); // Company Address
     doc.text("GST No: 29AALPZ8892L1Z8", 64, 40); // Company GST No
     doc.text("Mobile: +91 9900 693 336", 122, 40); // Company Mobile No
-    doc.line(14, 45, 200, 45);
+    doc.line(14, 50, 200, 50);
 
     // Adding Invoice Title
-    doc.setFontSize(18);
-    doc.text(`${invoiceType} - Invoice`, 16, 55);
-    // doc.text(`${invoiceType}`, 136, 55);
+    doc.setFontSize(14);
+    doc.text(`Tax Invoice`, 98, 48);
 
     // Invoice Details
     doc.setFontSize(12);
-    doc.text(`Invoice Number: ${invoiceNumber}`, 14, 68);
+    doc.text(`Invoice Number: ${invoiceNumber}`, 14, 56);
     const formatDate = (date) => {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     };
 
-    doc.text(`Invoice Date: ${formatDate(invoiceDate)}`, 130, 68);
-    doc.text(`Name: ${name}`, 14, 76);
-    doc.text(`Mobile: ${mobile}`, 14, 84);
-    doc.text(`Address: ${address}`, 14, 92);
-    doc.text(`GST No: ${customerGST}`, 130, 76);
-    doc.text(`E-Way Bill No: ${ewayBill}`, 130, 84);
+    doc.text(`Invoice Date: ${formatDate(invoiceDate)}`, 14, 62);
+    doc.text(`State : Karnataka , State Code : 29`, 14, 68);
+    doc.text(`E-Way Bill No: ${ewayBill}`, 130, 56);
+    doc.text(`Vehicle No: ${vehicleNo}`, 130, 62);
+    doc.line(14, 70, 200, 70);
+    doc.text(`Details of Consignee (Billed To)`, 15, 75);
+    doc.text(`Details of Consignee (Shipped To)`, 115, 75);
+    doc.line(14, 78, 200, 78);
+
+    //Billed To
+    doc.text(`Name: ${name}`, 14, 83);
+    doc.text(`Mobile: ${mobile}`, 14, 89);
+    // Address with wrapping
+    const maxLineWidth = 98; // Adjust as per your layout
+    const wrappedAddress = doc.splitTextToSize(
+      `Address: ${address}`,
+      maxLineWidth
+    );
+    doc.text(wrappedAddress, 14, 95);
+    doc.text(`GST No: ${customerGST}`, 14, 107);
+
+    //Shipped To
+    doc.text(`Name: ${shippedName}`, 114, 83);
+    doc.text(`Mobile: ${shippedMobile}`, 114, 89);
+    const wrappedAddressShip = doc.splitTextToSize(
+      `Address: ${shippedAddress}`,
+      maxLineWidth
+    );
+    doc.text(wrappedAddressShip, 114, 95);
+    doc.text(`GST No: ${shippedGST}`, 114, 107);
 
     // Table Headers
     const headers = [
@@ -132,10 +153,10 @@ function InvoiceGenerator() {
     doc.autoTable({
       head: headers,
       body: data,
-      startY: 100,
+      startY: 110,
       theme: "grid",
       headStyles: {
-        fillColor: [0, 74, 173], // Blue background for header
+        fillColor: [237, 104, 2], // Blue background for header
         textColor: [255, 255, 255], // White text for header
         fontSize: 10, // Header font size
       },
@@ -150,7 +171,6 @@ function InvoiceGenerator() {
         6: { halign: "right" }, // Right alignment for 'Quantity' column
       },
     });
-    
 
     // GST Calculation
     const totalAmount = calculateTotal();
@@ -173,36 +193,42 @@ function InvoiceGenerator() {
     // Displaying GST and Final Amount
     doc.text(
       `Subtotal: ${subTotal.toFixed(2)}`,
-      140,
-      doc.lastAutoTable.finalY + 10
+      195,
+      doc.lastAutoTable.finalY + 10,
+      "right"
     );
     if (cgstAmount > 0 && sgstAmount > 0) {
       doc.text(
         `CGST: ${cgstAmount.toFixed(2)}`,
-        140,
-        doc.lastAutoTable.finalY + 18
+        195,
+        doc.lastAutoTable.finalY + 18,
+        "right"
       );
       doc.text(
         `SGST: ${sgstAmount.toFixed(2)}`,
-        140,
-        doc.lastAutoTable.finalY + 26
+        195,
+        doc.lastAutoTable.finalY + 26,
+        "right"
       );
     } else if (igstAmount > 0) {
       doc.text(
         `IGST: ${igstAmount.toFixed(2)}`,
-        140,
-        doc.lastAutoTable.finalY + 18
+        195,
+        doc.lastAutoTable.finalY + 18,
+        "right"
       );
     }
     doc.text(
       `GST Amount: ${gstAmount.toFixed(2)}`,
-      140,
-      doc.lastAutoTable.finalY + 34
+      195,
+      doc.lastAutoTable.finalY + 34,
+      "right"
     );
     doc.text(
       `Total Amount: ${finalAmount.toFixed(2)}`,
-      140,
-      doc.lastAutoTable.finalY + 42
+      195,
+      doc.lastAutoTable.finalY + 42,
+      "right"
     );
     doc.line(
       14,
@@ -223,11 +249,11 @@ function InvoiceGenerator() {
     doc.text("IFSC: KKBK0008057", 14, doc.lastAutoTable.finalY + 82);
     doc.text("Branch: BOMMANAHALLI", 14, doc.lastAutoTable.finalY + 90);
 
-    doc.setTextColor(0, 74, 173); // Set text color to RGB (0, 74, 173)
+    doc.setTextColor(237, 104, 2); // Set text color to RGB (237, 104, 2)
     doc.setFont("helvetica", "bold");
-doc.setFontSize(14); // Set font size to 14
-doc.text("For Steel Art", 150, doc.lastAutoTable.finalY + 66);
-doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
+    doc.setFontSize(14); // Set font size to 14
+    doc.text("For Steel Art", 150, doc.lastAutoTable.finalY + 66);
+    doc.addImage(signature, "PNG", 145, doc.lastAutoTable.finalY + 70, 40, 20);
     // Saving PDF
     doc.save("invoice.pdf");
   };
@@ -245,7 +271,6 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
       <form className="invoice-form" onSubmit={handleSubmit}>
         <div className="input-group">
           <div>
-            <label>Invoice Number:</label>
             <input
               type="text"
               value={invoiceNumber}
@@ -278,23 +303,13 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
               required
             />
           </div>
-          <div className="input-group">
-            <label>Invoice Type:</label>
-            <select
-              value={invoiceType}
-              onChange={(e) => setInvoiceType(e.target.value)}
-             
-            >
-              <option value="Project">Project</option>
-              <option value="Consigment">Consigment</option>
-              <option value="Delivery">Delivery</option>
-            </select>
-          </div>
         </div>
 
         <div className="input-group">
+          <label style={{ fontWeight: "bold", fontSize: "20px" }}>
+            Billed To
+          </label>
           <div>
-            <label>Customer Name:</label>
             <input
               type="text"
               value={name}
@@ -304,7 +319,7 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
             />
           </div>
           <div>
-            <label>Mobile:</label>
+          <label> </label>
             <input
               type="text"
               value={mobile}
@@ -314,21 +329,18 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
             {mobileError && <div style={{ color: "red" }}>{mobileError}</div>}{" "}
             {/* Display error */}
           </div>
-        </div>
-
-        <div className="input-group">
           <div>
-            <label>Address:</label>
+          <label></label>
+
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Enter Address"
-              required
             />
           </div>
           <div>
-            <label>Customer GST No:</label>
+          <label> </label>
             <input
               type="text"
               value={customerGST}
@@ -341,8 +353,59 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
               placeholder="Enter Customer GST No (15 characters)"
             />
           </div>
+        </div>
+        <div className="input-group">
+        <label style={{ fontWeight: "bold", fontSize: "20px" }}>Shipped To</label>
+        <div>
+        <label> </label>
+            <input
+              type="text"
+              value={shippedName}
+              onChange={(e) => setShippedName(e.target.value)}
+              placeholder="Enter Customer Name"
+             
+            />
+          </div>
           <div>
-            <label>E-Way Bill No:</label>
+          <label> </label>
+            <input
+              type="text"
+              value={shippedMobile}
+              onChange={(e) => setShippedMobile(e.target.value)}
+              placeholder="Enter Mobile Number"
+            />
+            {mobileError && <div style={{ color: "red" }}>{mobileError}</div>}{" "}
+            {/* Display error */}
+          </div>
+          <div>
+          <label> </label>
+            <input
+              type="text"
+              value={shippedAddress}
+              onChange={(e) => setShippedAddress(e.target.value)}
+              placeholder="Enter Address"
+              
+            />
+          </div>
+          <div>
+          <label> </label>
+            <input
+              type="text"
+              value={shippedGST}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || value.length <= 15) {
+                  setShippedGST(value); // Update only if value is empty or 15 characters or less
+                }
+              }}
+              placeholder="Enter Customer GST No (15 characters)"
+            />
+          </div>
+        </div>
+
+        <div className="input-group">
+          <div>
+            <label></label>
             <input
               type="text"
               value={ewayBill}
@@ -350,8 +413,17 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
               placeholder="Enter EWay Bill No"
             />
           </div>
+          <div>
+            <label></label>
+            <input
+              type="text"
+              value={vehicleNo}
+              onChange={(e) => setVehicleNo(e.target.value)}
+              placeholder="Enter Vehicle No"
+            />
+          </div>
           <div className="input-group">
-            <label>GST Type:</label>
+            <label></label>
             <select
               value={gstType}
               onChange={(e) => setGstType(e.target.value)}
@@ -369,7 +441,7 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
           <div className="item-row" key={index}>
             <div className="input-group">
               <div>
-                <label>Description:</label>
+                <label></label>
                 <input
                   type="text"
                   name="description"
@@ -380,7 +452,7 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
               </div>
 
               <div>
-                <label>HSN:</label>
+                <label></label>
                 <input
                   type="text"
                   name="hsn"
@@ -402,7 +474,7 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
               </div>
 
               <div>
-                <label>Unit:</label>
+                <label></label>
                 <input
                   type="text"
                   name="unit"
@@ -424,12 +496,16 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
               </div>
 
               <div>
-                <label>Amount:</label>
+                <label></label>
                 <input type="text" value={item.amount} readOnly />
               </div>
             </div>
 
-            <button className="remove-button" type="button" onClick={() => removeItem(index)}>
+            <button
+              className="remove-button"
+              type="button"
+              onClick={() => removeItem(index)}
+            >
               Remove Item
             </button>
             <hr />
@@ -442,7 +518,9 @@ doc.addImage(signature, 'PNG', 145, doc.lastAutoTable.finalY + 70, 40, 20);
         <br />
         <br />
 
-        <button className="generate-button" type="submit">Generate Invoice</button>
+        <button className="generate-button" type="submit">
+          Generate Invoice
+        </button>
       </form>
     </div>
   );
