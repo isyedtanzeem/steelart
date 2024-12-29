@@ -4,6 +4,7 @@ import "./Invoice.css";
 import "jspdf-autotable";
 import signature from "./Images/signature.png";
 import logo from "./Images/saLogo.png";
+import { ToWords } from "to-words";
 
 function InvoiceGenerator() {
   const [name, setName] = useState("");
@@ -14,7 +15,6 @@ function InvoiceGenerator() {
   const [shippedMobile, setShippedMobile] = useState("");
   const [shippedAddress, setShippedAddress] = useState("");
   const [shippedGST, setShippedGST] = useState("");
-  
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -93,12 +93,18 @@ function InvoiceGenerator() {
     doc.line(14, 50, 200, 50);
 
     // Adding Invoice Title
-    doc.setFontSize(14);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
     doc.text(`Tax Invoice`, 98, 48);
 
     // Invoice Details
     doc.setFontSize(12);
-    doc.text(`Invoice Number: ${invoiceNumber}`, 14, 56);
+    doc.setFont("helvetica", "none");
+    doc.setTextColor(0, 0, 0); // Set color to black
+    doc.text("Invoice Number: ", 14, 56);
+    doc.setTextColor(255, 0, 0); // Set color to red
+    doc.text(invoiceNumber, doc.getTextWidth("Invoice Number: ") + 14, 56);
+    doc.setTextColor(0, 0, 0); // Reset color to black after this
     const formatDate = (date) => {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
@@ -107,7 +113,7 @@ function InvoiceGenerator() {
     doc.text(`Invoice Date: ${formatDate(invoiceDate)}`, 14, 62);
     doc.text(`State : Karnataka , State Code : 29`, 14, 68);
     doc.text(`E-Way Bill No: ${ewayBill}`, 130, 56);
-    doc.text(`Vehicle No: ${vehicleNo}`, 130, 62);
+    doc.text(`Vehicle No: ${vehicleNo.toLocaleUpperCase()}`, 130, 62);
     doc.line(14, 70, 200, 70);
     doc.text(`Details of Consignee (Billed To)`, 15, 75);
     doc.text(`Details of Consignee (Shipped To)`, 115, 75);
@@ -123,7 +129,7 @@ function InvoiceGenerator() {
       maxLineWidth
     );
     doc.text(wrappedAddress, 14, 95);
-    doc.text(`GST No: ${customerGST}`, 14, 107);
+    doc.text(`GST No: ${customerGST.toLocaleUpperCase()}`, 14, 107);
 
     //Shipped To
     doc.text(`Name: ${shippedName}`, 114, 83);
@@ -133,7 +139,7 @@ function InvoiceGenerator() {
       maxLineWidth
     );
     doc.text(wrappedAddressShip, 114, 95);
-    doc.text(`GST No: ${shippedGST}`, 114, 107);
+    // doc.text(`GST No: ${shippedGST.toLocaleUpperCase()}`, 114, 107);
 
     // Table Headers
     const headers = [
@@ -149,6 +155,7 @@ function InvoiceGenerator() {
       item.amount,
     ]);
 
+    
     // Adding Table to PDF
     doc.autoTable({
       head: headers,
@@ -164,14 +171,34 @@ function InvoiceGenerator() {
         fillColor: [245, 245, 245], // Light gray background for alternate rows
       },
       columnStyles: {
-        3: { halign: "right", textColor: [0, 128, 0] }, // Green text for the 'Rate' column
-        5: { halign: "center", textColor: [255, 0, 0] }, // Red text for the 'Amount' column
+        3: { halign: "right" }, // Green text for the 'Rate' column
+        5: { halign: "center" }, // Red text for the 'Amount' column
         2: { halign: "center" }, // Center alignment for 'HSN' column
         4: { halign: "center" }, // Center alignment for 'Unit' column
         6: { halign: "right" }, // Right alignment for 'Quantity' column
       },
     });
 
+    const toWords = new ToWords({
+      localeCode: "en-IN",
+      converterOptions: {
+        currency: true,
+        ignoreDecimal: false,
+        ignoreZeroCurrency: false,
+        doNotAddOnly: false,
+        currencyOptions: {
+          // can be used to override defaults for the selected locale
+          name: "Rupee",
+          plural: "Rupees",
+          symbol: "₹",
+          fractionalUnit: {
+            name: "Paisa",
+            plural: "Paise",
+            symbol: "",
+          },
+        },
+      },
+    });
     // GST Calculation
     const totalAmount = calculateTotal();
     let gstAmount = 0;
@@ -243,17 +270,34 @@ function InvoiceGenerator() {
       doc.lastAutoTable.finalY + 36
     );
 
-    doc.text("Bank Account Details:", 14, doc.lastAutoTable.finalY + 58);
-    doc.text("Kotak Mahindra Bank", 14, doc.lastAutoTable.finalY + 66);
-    doc.text("A/C No: 8073761599", 14, doc.lastAutoTable.finalY + 74);
-    doc.text("IFSC: KKBK0008057", 14, doc.lastAutoTable.finalY + 82);
-    doc.text("Branch: BOMMANAHALLI", 14, doc.lastAutoTable.finalY + 90);
+    let inWords = toWords.convert(finalAmount, { currency: true });
 
-    doc.setTextColor(237, 104, 2); // Set text color to RGB (237, 104, 2)
+    doc.text(`In Words: ${inWords}`, 14, doc.lastAutoTable.finalY + 52);
+    doc.line(
+      14,
+      doc.lastAutoTable.finalY + 55,
+      200,
+      doc.lastAutoTable.finalY + 55
+    );
+    doc.setFont("helvetica", "bold");
+    doc.text("Bank Account Details:", 14, doc.lastAutoTable.finalY + 62);
+    doc.setFont("helvetica", "none");
+    doc.text("Kotak Mahindra Bank", 14, doc.lastAutoTable.finalY + 68);
+    doc.text("A/C No: 8073761599", 14, doc.lastAutoTable.finalY + 74);
+    doc.text("IFSC  : KKBK0008057", 14, doc.lastAutoTable.finalY + 80);
+    doc.text("Branch: BOMMANAHALLI", 14, doc.lastAutoTable.finalY + 86);
+
+    doc.setTextColor(50, 86, 168); // Set text color to RGB (237, 104, 2)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14); // Set font size to 14
-    doc.text("For Steel Art", 150, doc.lastAutoTable.finalY + 66);
-    doc.addImage(signature, "PNG", 145, doc.lastAutoTable.finalY + 70, 40, 20);
+    doc.text("For Steel Art", 96, doc.lastAutoTable.finalY + 64);
+    doc.addImage(signature, "PNG", 95, doc.lastAutoTable.finalY + 70, 40, 20);
+    doc.setFont("helvetica", "none");
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12); // Set font size to 14
+    doc.text("Receiver's Signature", 150, doc.lastAutoTable.finalY + 85);
+
     // Saving PDF
     doc.save("invoice.pdf");
   };
@@ -319,7 +363,7 @@ function InvoiceGenerator() {
             />
           </div>
           <div>
-          <label> </label>
+            <label> </label>
             <input
               type="text"
               value={mobile}
@@ -330,8 +374,7 @@ function InvoiceGenerator() {
             {/* Display error */}
           </div>
           <div>
-          <label></label>
-
+            <label></label>
             <input
               type="text"
               value={address}
@@ -340,7 +383,7 @@ function InvoiceGenerator() {
             />
           </div>
           <div>
-          <label> </label>
+            <label> </label>
             <input
               type="text"
               value={customerGST}
@@ -355,19 +398,20 @@ function InvoiceGenerator() {
           </div>
         </div>
         <div className="input-group">
-        <label style={{ fontWeight: "bold", fontSize: "20px" }}>Shipped To</label>
-        <div>
-        <label> </label>
+          <label style={{ fontWeight: "bold", fontSize: "20px" }}>
+            Shipped To
+          </label>
+          <div>
+            <label> </label>
             <input
               type="text"
               value={shippedName}
               onChange={(e) => setShippedName(e.target.value)}
               placeholder="Enter Customer Name"
-             
             />
           </div>
           <div>
-          <label> </label>
+            <label> </label>
             <input
               type="text"
               value={shippedMobile}
@@ -378,16 +422,15 @@ function InvoiceGenerator() {
             {/* Display error */}
           </div>
           <div>
-          <label> </label>
+            <label> </label>
             <input
               type="text"
               value={shippedAddress}
               onChange={(e) => setShippedAddress(e.target.value)}
               placeholder="Enter Address"
-              
             />
           </div>
-          <div>
+          {/* <div>
           <label> </label>
             <input
               type="text"
@@ -400,7 +443,7 @@ function InvoiceGenerator() {
               }}
               placeholder="Enter Customer GST No (15 characters)"
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="input-group">
