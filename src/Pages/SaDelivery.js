@@ -106,16 +106,16 @@ function DCGenerator() {
     doc.setFontSize(10);
     doc.setFont("helvetica", "none");
     doc.setTextColor(0, 0, 0); // Set color to black
-    doc.text("Invoice Number: ", 14, 56);
+    doc.text("DC Number: ", 14, 56);
     doc.setTextColor(255, 0, 0); // Set color to red
-    doc.text(invoiceNumber, doc.getTextWidth("Invoice Number: ") + 14, 56);
+    doc.text(invoiceNumber, doc.getTextWidth("DC Number: ") + 14, 56);
     doc.setTextColor(0, 0, 0); // Reset color to black after this
     const formatDate = (date) => {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     };
 
-    doc.text(`Invoice Date: ${formatDate(invoiceDate)}`, 14, 62);
+    doc.text(`Date: ${formatDate(invoiceDate)}`, 14, 62);
     doc.text(`State : Karnataka , State Code : 29`, 14, 68);
     doc.text(`E-Way Bill No: ${ewayBill}`, 130, 56);
     doc.text(`Vehicle No: ${vehicleNo.toLocaleUpperCase()}`, 130, 62);
@@ -308,7 +308,7 @@ doc.text(
     doc.text("Receiver's Signature", 155, doc.lastAutoTable.finalY + 66);
 
     // Saving PDF
-    doc.save(`SaInvoice-${invoiceNumber}.pdf`);
+    doc.save(`SaDC-${invoiceNumber}.pdf`);
   };
 
   const handleSubmit = (e) => {

@@ -17,35 +17,28 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          {/* <Route 
-            path="/" 
-            element={isAuthenticated ? <Home /> : <Navigate to="/login" />} 
-          /> */}
           
           <Route 
             path="/" 
             element={ <Home />} 
           />
-          {/* <Route 
-            path="/SaInvoice" 
-            element={isAuthenticated ? <SaInvoice /> : <Navigate to="/login" />} 
-          /> */}
           <Route 
             path="/SaInvoice" 
             element= {<SaInvoice /> }
             />
           <Route 
+            path="/SaProforma" 
+            element= {<SaProforma /> }
+            />
+          <Route 
             path="/SaDelivery" 
-            element={isAuthenticated ? <SaDelivery /> : <Navigate to="/login" />} 
-          />
+            element= {<SaDelivery /> }
+            />
           <Route 
             path="/SaQuote" 
-            element={isAuthenticated ? <SaQuote /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/SaProforma" 
-            element={isAuthenticated ? <SaProforma /> : <Navigate to="/login" />} 
-          />
+            element= {<SaQuote /> }
+            />
+        
         </Routes>
       </Router>
     </div>
