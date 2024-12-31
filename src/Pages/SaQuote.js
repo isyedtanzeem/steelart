@@ -8,34 +8,36 @@ import { ToWords } from "to-words";
 
 function QuotationGenerator() {
   const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [attendName, setAttendName] = useState("");
+  const [quotainName, setQuotainName] = useState("");
+  const [note, setNote] = useState("");
   const [address, setAddress] = useState("");
   const [customerGST, setCustomerGST] = useState("");
 
   const getCurrentDate = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
     const dd = String(today.getDate()).padStart(2, "0");
-    return `$${dd}/${mm}/${yyyy}-`;
+    return `${dd}/${mm}/${yyyy}`;
   };
 
-  const [invoiceDate, setInvoiceDate] = useState(getCurrentDate()); // Default to today's date
-  const [vehicleNo, setVehicleNo] = useState("");
-  const [mobileError, setMobileError] = useState("");
+  const [invoiceDate, setInvoiceDate] = useState(getCurrentDate());
 
   const [items, setItems] = useState([
-    { description: "", quantity: 1, rate: 0, amount: 0 },
+    { description: "", quantity: 1, wpm: "", totalKg: 0, rate: "", amount: 0, unit: "" },
   ]);
 
   const handleInputChange = (index, e) => {
     const values = [...items];
     values[index][e.target.name] = e.target.value;
 
-    // Recalculate amount for the item
-    if (e.target.name === "quantity" || e.target.name === "rate") {
-      values[index].amount = values[index].quantity * values[index].rate;
-    }
+    const quantity = parseFloat(values[index].quantity) || 0;
+    const wpm = parseFloat(values[index].wpm) || 0;
+    const rate = parseFloat(values[index].rate) || 0;
+
+    values[index].totalKg = quantity * wpm;
+    values[index].amount = values[index].totalKg * rate;
 
     setItems(values);
   };
@@ -44,7 +46,7 @@ function QuotationGenerator() {
     if (items.length < 15) {
       setItems([
         ...items,
-        { description: "", quantity: 1, rate: 0, amount: 0 },
+        { description: "", quantity: 1, wpm: "", totalKg: 0, rate: "", amount: 0, unit: "" },
       ]);
     } else {
       console.log("Cannot add more than 15 items");
@@ -60,164 +62,128 @@ function QuotationGenerator() {
   const calculateTotal = () => {
     return items.reduce((acc, item) => acc + item.amount, 0);
   };
-
-  const validateGST = (gstNumber) => {
-    // Validate if GST number is 15 characters
-    return gstNumber.length === 15;
+  const calculateKg = () => {
+    return items.reduce((acc, item) => acc + item.totalKg, 0);
   };
 
   const generatePDF = () => {
     const doc = new jsPDF();
 
+    // Header Section
     doc.addImage(logo, "PNG", 14, 12, 30, 30);
-
     doc.setFontSize(40);
-    doc.setTextColor(1, 84, 7);
     doc.setFont("helvetica", "bold");
-    doc.text("STEEL ART", 64, 28); // Company Name
+    doc.setTextColor(1, 84, 7);
+    doc.text("STEEL ART", 64, 28);
     doc.setTextColor(0, 0, 0);
-    doc.setFont("calibri", "none");
-
+    doc.setFont("helvetica", "none");
     doc.setFontSize(9);
-    doc.text(
-      "Ground Floor, 240/2, Amalodbhava Nagara, Begur Main Road, Bengaluru - 560068",
-      54,
-      34
-    ); // Company Address
-    doc.text("GST No: 29AALPZ8892L1Z8", 64, 40); // Company GST No
-    doc.text("Mobile: +91 9900 693 336", 122, 40); // Company Mobile No
+    doc.text("Ground Floor, 240/2, Amalodbhava Nagara, Begur Main Road, Bengaluru - 560068", 54, 34);
+    doc.text("GST No: 29AALPZ8892L1Z8", 64, 40);
+    doc.text("Mobile: +91 9900 693 336", 122, 40);
     doc.line(14, 50, 200, 50);
 
-    // Adding Quotation Title
+    // Quotation Title
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text(`Quotation`, 94, 48);
 
     // Quotation Details
     doc.setFontSize(10);
-    doc.setFont("helvetica", "none");
-    doc.setTextColor(0, 0, 0); // Set color to black
-    doc.setTextColor(0, 0, 0); // Reset color to black after this
-    const formatDate = (date) => {
-      const [year, month, day] = date.split("-");
-      return `${day}/${month}/${year}`;
-    };
-
-    doc.text(`Date: ${formatDate(invoiceDate)}`, 14, 58);
-    doc.text(`State : Karnataka , State Code : 29`, 14, 64);
-    doc.line(14, 70, 200, 70);
-    doc.text(`Details of Consignee (Quotation To)`, 15, 75);
-
-    doc.line(14, 78, 200, 78);
-
-    //Billed To
-    doc.text(`Name: ${name}`, 14, 83);
-    doc.text(`Mobile: ${mobile}`, 14, 88);
-    // Address with wrapping
-    const maxLineWidth = 98; // Adjust as per your layout
-    const wrappedAddress = doc.splitTextToSize(
-      `Address: ${address}`,
-      maxLineWidth
+    doc.text(`Date: ${invoiceDate}`, 14, 58);
+    doc.text(`Ref: ${name}`, 14, 63);
+    doc.text(`${address}`, 20, 68);
+    doc.text(`Project:`, 20, 73);
+    doc.text(`Kind Attn Mr: ${attendName}`, 20, 78);
+    doc.text(`Quotation: ${quotainName}`, 20, 83);
+    doc.text(
+      `Dear Sir, with reference to the above subject, we are pleased to quote our rates as follows:`,
+      20,
+      90
     );
-    doc.text(wrappedAddress, 14, 93);
-    doc.text(`GST No: ${customerGST.toLocaleUpperCase()}`, 14, 102);
-
-    // Table Headers
+    const totalAmount = calculateTotal();
+    const totalKg = calculateKg();
+    // Table Data
     const headers = [
-      ["No", "Description", "HSN", "Rate", "Unit", "Qty", "Amount"],
+      ["No", "Description", "Wt p/mtr", "Qty", "Unit", "Total Kg", "Rate", "Amount"],
+    ];
+    const footer = [
+      ["", "", "", "", "", `${totalKg.toFixed(2)}`, "", `${totalAmount.toFixed(2)}`],
     ];
     const data = items.map((item, index) => [
-      index + 1, // Serial number (Sl No)
+      index + 1,
       item.description,
-      item.hsn,
-      item.rate,
-      item.unit,
+      item.wpm,
       item.quantity,
-      item.amount,
+      item.unit,
+      item.totalKg.toFixed(2),
+      item.rate,
+      item.amount.toFixed(2),
     ]);
 
-    // Adding Table to PDF
-    // Ensure the data contains exactly 15 rows
-    const fixedRows = 18;
+    // Ensure table rows are exactly 15
+    const fixedRows = 15;
     while (data.length < fixedRows) {
-      data.push(["", "", "", "", "", ""]); // Add blank rows
+      data.push(["", "", "", "", "", "", "", ""]);
     }
 
     doc.autoTable({
       head: headers,
-      body: data.slice(0, fixedRows), // Ensure only the first 15 rows are displayed
-      startY: 106,
+      foot:footer,
+      body: data,
+      startY: 94,
       theme: "grid",
-      headStyles: {
-        fillColor: [1, 84, 7], // Blue background for header
-        textColor: [255, 255, 255], // White text for header
-        fontSize: 9, // Header font size
-      },
-      bodyStyles: {
-        fontSize: 9, // Body font size
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245], // Light gray background for alternate rows
-      },
+      headStyles: { fillColor: [1, 84, 7], textColor: [255, 255, 255], fontSize: 9 ,halign: "center"},
+      footStyles: { fillColor: [255,255,255], textColor: [0, 0, 0], fontSize: 9 ,halign: "right"},
+      bodyStyles: { fontSize: 9 },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
       columnStyles: {
-        3: { halign: "right" }, // Right alignment for 'Rate' column
-        5: { halign: "center" }, // Center alignment for 'Amount' column
-        2: { halign: "center" }, // Center alignment for 'HSN' column
-        4: { halign: "center" }, // Center alignment for 'Unit' column
-        6: { halign: "right" }, // Right alignment for 'Quantity' column
+        3: { halign: "center" },
+        2: { halign: "center" },
+        4: { halign: "center" },
+        5: { halign: "right" },
+        6: { halign: "right" },
+        7: { halign: "right" },
       },
     });
 
+    // Total Amount
+    
+    // doc.text(
+    //   `Total KG: ${totalKg.toFixed(2)}`,
+    //   150,
+    //   doc.lastAutoTable.finalY + 6,
+    //   "right"
+    // );
+    // // Total Amount
+    
+    // doc.text(
+    //   `Total Amount: ${totalAmount.toFixed(2)}`,
+    //   195,
+    //   doc.lastAutoTable.finalY + 6,
+    //   "right"
+    // );
+
+    // Amount in Words
     const toWords = new ToWords({
       localeCode: "en-IN",
       converterOptions: {
         currency: true,
-        ignoreDecimal: false,
-        ignoreZeroCurrency: false,
-        doNotAddOnly: false,
-        currencyOptions: {
-          // can be used to override defaults for the selected locale
-          name: "Rupee",
-          plural: "Rupees",
-          symbol: "₹",
-          fractionalUnit: {
-            name: "Paisa",
-            plural: "Paise",
-            symbol: "",
-          },
-        },
+        fractionalUnit: { name: "Paisa", plural: "Paise" },
       },
     });
-    // GST Calculation
-    const totalAmount = calculateTotal();
-
-    // Displaying amounts in the PDF
-
-    doc.text(
-      `Total Amount: ${totalAmount.toFixed(2)}`,
-      195,
-      doc.lastAutoTable.finalY + 6,
-      "right"
-    );
-
-    let inWords = toWords.convert(totalAmount, { currency: true });
-
+    const inWords = toWords.convert(totalAmount);
     doc.text(`In Words: ${inWords}`, 14, doc.lastAutoTable.finalY + 12);
-    doc.line(
-      14,
-      doc.lastAutoTable.finalY + 14,
-      200,
-      doc.lastAutoTable.finalY + 14
-    );
 
-    doc.setTextColor(0, 0, 0); // Set text color to RGB (237, 104, 2)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(13); // Set font size to 14
+    // Footer Section
+    doc.line(14, doc.lastAutoTable.finalY + 14, 200, doc.lastAutoTable.finalY + 14);
+    doc.text(`Note: Any Taxes,other's will be extra.`, 14, doc.lastAutoTable.finalY + 22);
+    doc.text(`${note}`, 24, doc.lastAutoTable.finalY + 26);
+
+    doc.setFontSize(13);
     doc.text("For Steel Art", 162, doc.lastAutoTable.finalY + 22);
     doc.addImage(signature, "PNG", 160, doc.lastAutoTable.finalY + 24, 40, 20);
-    doc.setFont("helvetica", "none");
 
-    // Saving PDF
     doc.save(`SaQuote-${name}.pdf`);
   };
 
@@ -253,21 +219,11 @@ function QuotationGenerator() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter Customer Name"
+              placeholder="Enter Comapny Name"
               required
             />
           </div>
-          <div>
-            <label> </label>
-            <input
-              type="text"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              placeholder="Enter Mobile Number"
-            />
-            {mobileError && <div style={{ color: "red" }}>{mobileError}</div>}{" "}
-            {/* Display error */}
-          </div>
+
           <div>
             <label></label>
             <input
@@ -281,16 +237,30 @@ function QuotationGenerator() {
             <label> </label>
             <input
               type="text"
-              value={customerGST}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "" || value.length <= 15) {
-                  setCustomerGST(value); // Update only if value is empty or 15 characters or less
-                }
-              }}
-              placeholder="Enter Customer GST No (15 characters)"
+              value={attendName}
+              onChange={(e) => setAttendName(e.target.value)}
+              placeholder="Enter Attend Name "
             />
           </div>
+          <div>
+            <label> </label>
+            <input
+              type="text"
+              value={quotainName}
+              onChange={(e) => setQuotainName(e.target.value)}
+              placeholder="Enter Quotaion "
+            />
+          </div>
+          <div>
+            <label>Note </label>
+            <input
+              type="text"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Enter Note "
+            />
+          </div>
+         
         </div>
 
         <h3>Items</h3>
@@ -309,36 +279,14 @@ function QuotationGenerator() {
               </div>
 
               <div>
-                <label></label>
+                <label>Weight per mtr</label>
                 <input
                   type="text"
-                  name="hsn"
-                  value={item.hsn}
+                  name="wpm"
+                  value={item.wpm}
                   onChange={(e) => handleInputChange(index, e)}
-                  placeholder="Enter HSN"
-                />
-              </div>
-
-              <div>
-                <label>Rate:</label>
-                <input
-                  type="number"
-                  name="rate"
-                  value={item.rate}
-                  onChange={(e) => handleInputChange(index, e)}
-                  min="0"
-                  step="any"
-                />
-              </div>
-
-              <div>
-                <label></label>
-                <input
-                  type="text"
-                  name="unit"
-                  value={item.unit}
-                  onChange={(e) => handleInputChange(index, e)}
-                  placeholder="Enter Unit"
+                  placeholder="Enter Weight per miter"
+                  required
                 />
               </div>
 
@@ -352,6 +300,35 @@ function QuotationGenerator() {
                   min="1"
                 />
               </div>
+              <div>
+                <label></label>
+                <input
+                  type="text"
+                  name="unit"
+                  value={item.unit}
+                  onChange={(e) => handleInputChange(index, e)}
+                  placeholder="Enter Unit"
+                />
+              </div>
+              <div>
+                <label>Total kg</label>
+                <input type="text" value={item.totalKg} readOnly />
+              </div>
+           
+              <div>
+                <label>Rate:</label>
+                <input
+                  type="number"
+                  name="rate"
+                  value={item.rate}
+                  onChange={(e) => handleInputChange(index, e)}
+                  min="0"
+                  step="any"
+                  required
+                />
+              </div>
+
+             
 
               <div>
                 <label></label>

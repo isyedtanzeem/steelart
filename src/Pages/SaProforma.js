@@ -93,7 +93,7 @@ function ProformaGenerator() {
     // Adding Proforma Title
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text(`Delivery Challan`, 82, 48);
+    doc.text(`Proforma`, 88, 48);
 
     // Proforma Details
     doc.setFontSize(10);
