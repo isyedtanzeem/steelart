@@ -2,11 +2,18 @@ import React from 'react';
 import logo from './logo.svg';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import SaQuote from './Pages/SaQuote';
 import Home from './Pages/Home';
+import SaHome from './Pages/SaHome';
+import MiHome from './Pages/MiHome';
 import SaInvoice from './Pages/SaInvoice';
 import SaDelivery from './Pages/SaDelivery';
 import SaProforma from './Pages/SaProforma';
+import SaQuote from './Pages/SaQuote';
+import MiInvoice from './Pages/MiInvoice';
+import MiDelivery from './Pages/MiDelivery';
+import MiProforma from './Pages/MiProforma';
+import MiQuote from './Pages/MiQuote';
+
 import Login from './Pages/Login';
 
 function App() {
@@ -16,11 +23,18 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
           
           <Route 
             path="/" 
             element={ <Home />} 
+          />
+          <Route 
+            path="/SaHome" 
+            element={ <SaHome />} 
+          />
+          <Route 
+            path="/MiHome" 
+            element={ <MiHome />} 
           />
           <Route 
             path="/SaInvoice" 
@@ -37,6 +51,22 @@ function App() {
           <Route 
             path="/SaQuote" 
             element= {<SaQuote /> }
+            />
+          <Route 
+            path="/MiInvoice" 
+            element= {<MiInvoice /> }
+            />
+          <Route 
+            path="/MiProforma" 
+            element= {<MiProforma /> }
+            />
+          <Route 
+            path="/MiDelivery" 
+            element= {<MiDelivery /> }
+            />
+          <Route 
+            path="/MiQuote" 
+            element= {<MiQuote /> }
             />
         
         </Routes>

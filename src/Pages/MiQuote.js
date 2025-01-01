@@ -118,17 +118,17 @@ function QuotationGenerator() {
     const doc = new jsPDF();
 
     // Header Section
-    doc.addImage(logo, "PNG", 14, 12, 30, 30);
+    // doc.addImage(logo, "PNG", 14, 12, 30, 30);
     doc.setFontSize(40);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(1, 84, 7);
-    doc.text("STEEL ART", 64, 28);
+    doc.text("MISBA ENTERPRISE", 58, 28);
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "none");
     doc.setFontSize(9);
     doc.text(
-      "Ground Floor, 240/2, Amalodbhava Nagara, Begur Main Road, Bengaluru - 560068",
-      54,
+      "Ground Floor, No. 6/17/9, Muneer mandir !2th Cross,Kaveri nagar,Hongasandra Bommanahalli, Bengaluru",
+      40,
       34
     );
     doc.text("GST No: 29AALPZ8892L1Z8", 64, 40);
@@ -362,10 +362,10 @@ doc.autoTable({
     doc.text(`${note}`, 24, doc.lastAutoTable.finalY + 26);
 
     doc.setFontSize(13);
-    doc.text("For Steel Art", 162, doc.lastAutoTable.finalY + 22);
+    doc.text("For Misba Enterprises", 162, doc.lastAutoTable.finalY + 22);
     doc.addImage(signature, "PNG", 160, doc.lastAutoTable.finalY + 24, 40, 20);
 
-    doc.save(`SaQuote-${name}.pdf`);
+    doc.save(`Quote-${name}.pdf`);
   };
 
   const handleSubmit = (e) => {
