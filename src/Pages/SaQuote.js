@@ -12,7 +12,17 @@ function QuotationGenerator() {
   const [quotainName, setQuotainName] = useState("");
   const [note, setNote] = useState("");
   const [address, setAddress] = useState("");
-  const [customerGST, setCustomerGST] = useState("");
+  const [fabricationExpenseAmount, setFabricationExpenseAmount] = useState("");
+  const [sfAmount, setSfAmount] = useState("");
+  const [wastageAmount, setWastageAmount] = useState("");
+  const [netProfitAmount, setNetProfitAmount] = useState("");
+  const [transportChargesAmount, setTransportChargesAmount] = useState("");
+
+  // State for fabrication charges
+  const [fabricationChargesUnit, setFabricationChargesUnit] = useState("");
+  const [fabricationChargesQuantity, setFabricationChargesQuantity] =
+    useState("");
+  const [fabricationChargesRate, setFabricationChargesRate] = useState("");
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -25,7 +35,7 @@ function QuotationGenerator() {
   const [invoiceDate, setInvoiceDate] = useState(getCurrentDate());
 
   const [items, setItems] = useState([
-    { description: "", quantity: 1, wpm: "", totalKg: 0, rate: "", amount: 0, unit: "" },
+    // { description: "", quantity: 1, wpm: "", totalKg: 0, rate: "", amount: 0, unit: "" },
   ]);
 
   const handleInputChange = (index, e) => {
@@ -36,8 +46,15 @@ function QuotationGenerator() {
     const wpm = parseFloat(values[index].wpm) || 0;
     const rate = parseFloat(values[index].rate) || 0;
 
-    values[index].totalKg = quantity * wpm;
-    values[index].amount = values[index].totalKg * rate;
+    if (wpm > 0) {
+      // If WPM is present, calculate totalKg and amount based on WPM
+      values[index].totalKg = quantity * wpm;
+      values[index].amount = values[index].totalKg * rate;
+    } else {
+      // If WPM is not present, calculate amount directly from quantity and rate
+      values[index].totalKg = 0; // Reset totalKg as WPM is not considered
+      values[index].amount = quantity * rate;
+    }
 
     setItems(values);
   };
@@ -46,7 +63,15 @@ function QuotationGenerator() {
     if (items.length < 15) {
       setItems([
         ...items,
-        { description: "", quantity: 1, wpm: "", totalKg: 0, rate: "", amount: 0, unit: "" },
+        {
+          description: "",
+          quantity: 1,
+          wpm: "",
+          totalKg: 0,
+          rate: "",
+          amount: 0,
+          unit: "",
+        },
       ]);
     } else {
       console.log("Cannot add more than 15 items");
@@ -59,9 +84,31 @@ function QuotationGenerator() {
     setItems(values);
   };
 
+  const fabricationChargesAmount =
+    (parseFloat(fabricationChargesQuantity) || 0) *
+    (parseFloat(fabricationChargesRate) || 0);
   const calculateTotal = () => {
-    return items.reduce((acc, item) => acc + item.amount, 0);
+    // Fixed amounts
+    const fabricationExpense = parseFloat(fabricationExpenseAmount || 0);
+    const wastage = parseFloat(wastageAmount) || 0;
+    const fabricationCharges = parseFloat(fabricationChargesAmount || 0);
+    const netProfit = parseFloat(netProfitAmount) || 0;
+    const transportCharges = parseFloat(transportChargesAmount) || 0;
+
+    // Calculate total from items
+    const itemsTotal = items.reduce((acc, item) => acc + (item.amount || 0), 0);
+
+    // Add fixed amounts
+    return (
+      itemsTotal +
+      fabricationExpense +
+      wastage +
+      fabricationCharges +
+      netProfit +
+      transportCharges
+    );
   };
+
   const calculateKg = () => {
     return items.reduce((acc, item) => acc + item.totalKg, 0);
   };
@@ -78,7 +125,11 @@ function QuotationGenerator() {
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "none");
     doc.setFontSize(9);
-    doc.text("Ground Floor, 240/2, Amalodbhava Nagara, Begur Main Road, Bengaluru - 560068", 54, 34);
+    doc.text(
+      "Ground Floor, 240/2, Amalodbhava Nagara, Begur Main Road, Bengaluru - 560068",
+      54,
+      34
+    );
     doc.text("GST No: 29AALPZ8892L1Z8", 64, 40);
     doc.text("Mobile: +91 9900 693 336", 122, 40);
     doc.line(14, 50, 200, 50);
@@ -102,67 +153,149 @@ function QuotationGenerator() {
       90
     );
     const totalAmount = calculateTotal();
+
     const totalKg = calculateKg();
     // Table Data
     const headers = [
-      ["No", "Description", "Wt p/mtr", "Qty", "Unit", "Total Kg", "Rate", "Amount"],
+      [
+        "No",
+        "Description",
+        "Weight",
+        "Unit",
+        "Qty",
+        "Total Kg",
+        "Rate",
+        "Amount",
+      ],
     ];
     const footer = [
-      ["", "", "", "", "", `${totalKg.toFixed(2)}`, "", `${totalAmount.toFixed(2)}`],
+      [
+        "",
+        "",
+        "",
+        "",
+        "",
+        `${totalKg.toFixed(2)}`,
+        "",
+        `${totalAmount.toFixed(2)}`,
+      ],
     ];
-    const data = items.map((item, index) => [
-      index + 1,
+
+    // Define fixed rows with input handling
+    const fixedRows = [
+      [
+        "1",
+        "Fabrication Expense",
+        "",
+        "",
+        "",
+        "",
+        "",
+        fabricationExpenseAmount
+          ? parseFloat(fabricationExpenseAmount).toFixed(2)
+          : "",
+      ],
+      [
+        "2",
+        "Wastage",
+        "",
+        "",
+        "",
+        "",
+        "",
+        wastageAmount ? parseFloat(wastageAmount).toFixed(2) : "",
+      ],
+      [
+        "3",
+        "Fabrication Charges",
+        fabricationChargesUnit || "",
+        "",
+        fabricationChargesQuantity || "",
+        "",
+        fabricationChargesRate
+          ? parseFloat(fabricationChargesRate).toFixed(2)
+          : "",
+        fabricationChargesAmount
+          ? parseFloat(fabricationChargesAmount).toFixed(2)
+          : "",
+      ],
+      [
+        "4",
+        "Net Profit",
+        "",
+        "",
+        "",
+        "",
+        "",
+        netProfitAmount ? parseFloat(netProfitAmount).toFixed(2) : "",
+      ],
+      [
+        "5",
+        "Transport Charges",
+        "",
+        "",
+        "",
+        "",
+        "",
+        transportChargesAmount
+          ? parseFloat(transportChargesAmount).toFixed(2)
+          : "",
+      ],
+    ];
+
+    // Calculate fabrication charges amount
+
+    // Map dynamic rows from `items`
+    const dynamicRows = items.map((item, index) => [
+      index + 6, // Start numbering after fixed rows
       item.description,
-      item.wpm,
-      item.quantity,
-      item.unit,
-      item.totalKg.toFixed(2),
-      item.rate,
-      item.amount.toFixed(2),
+      item.wpm || "",
+      item.unit || "",
+      item.quantity || "",
+      item.totalKg ? item.totalKg.toFixed(2) : "",
+      item.rate || "",
+      item.amount ? item.amount.toFixed(2) : "",
     ]);
 
+    // Combine fixed rows and dynamic rows
+    let data = [...fixedRows, ...dynamicRows];
+
     // Ensure table rows are exactly 15
-    const fixedRows = 15;
-    while (data.length < fixedRows) {
+    const minRows = 15;
+    while (data.length < minRows) {
       data.push(["", "", "", "", "", "", "", ""]);
     }
 
+    // Define table with headers, body, and footer
     doc.autoTable({
       head: headers,
-      foot:footer,
       body: data,
+      foot: footer,
       startY: 94,
       theme: "grid",
-      headStyles: { fillColor: [1, 84, 7], textColor: [255, 255, 255], fontSize: 9 ,halign: "center"},
-      footStyles: { fillColor: [255,255,255], textColor: [0, 0, 0], fontSize: 9 ,halign: "right"},
+      headStyles: {
+        fillColor: [1, 84, 7],
+        textColor: [255, 255, 255],
+        fontSize: 9,
+        halign: "center",
+      },
+      footStyles: {
+        fillColor: [255, 255, 255],
+        textColor: [0, 0, 0],
+        fontSize: 9,
+        halign: "right",
+      },
       bodyStyles: { fontSize: 9 },
       alternateRowStyles: { fillColor: [245, 245, 245] },
       columnStyles: {
-        3: { halign: "center" },
         2: { halign: "center" },
+        3: { halign: "center" },
         4: { halign: "center" },
         5: { halign: "right" },
         6: { halign: "right" },
         7: { halign: "right" },
       },
     });
-
-    // Total Amount
-    
-    // doc.text(
-    //   `Total KG: ${totalKg.toFixed(2)}`,
-    //   150,
-    //   doc.lastAutoTable.finalY + 6,
-    //   "right"
-    // );
-    // // Total Amount
-    
-    // doc.text(
-    //   `Total Amount: ${totalAmount.toFixed(2)}`,
-    //   195,
-    //   doc.lastAutoTable.finalY + 6,
-    //   "right"
-    // );
 
     // Amount in Words
     const toWords = new ToWords({
@@ -173,11 +306,21 @@ function QuotationGenerator() {
       },
     });
     const inWords = toWords.convert(totalAmount);
+    doc.text(`${sfAmount}`, 14, doc.lastAutoTable.finalY + 8);
     doc.text(`In Words: ${inWords}`, 14, doc.lastAutoTable.finalY + 12);
 
     // Footer Section
-    doc.line(14, doc.lastAutoTable.finalY + 14, 200, doc.lastAutoTable.finalY + 14);
-    doc.text(`Note: Any Taxes,other's will be extra.`, 14, doc.lastAutoTable.finalY + 22);
+    doc.line(
+      14,
+      doc.lastAutoTable.finalY + 14,
+      200,
+      doc.lastAutoTable.finalY + 14
+    );
+    doc.text(
+      `Note: Any Taxes,other's will be extra.`,
+      14,
+      doc.lastAutoTable.finalY + 22
+    );
     doc.text(`${note}`, 24, doc.lastAutoTable.finalY + 26);
 
     doc.setFontSize(13);
@@ -260,7 +403,86 @@ function QuotationGenerator() {
               placeholder="Enter Note "
             />
           </div>
-         
+        </div>
+
+        <div>
+          <h3>Additional Charges</h3>
+          <div>
+            <label>
+              Fabrication Expense:
+              <input
+                type="number"
+                value={fabricationExpenseAmount}
+                onChange={(e) => setFabricationExpenseAmount(e.target.value)}
+                 min="0"
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              Wastage Amount:
+              <input
+                type="number"
+                value={wastageAmount}
+                onChange={(e) => setWastageAmount(e.target.value)}
+                 min="0"
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              Net Profit:
+              <input
+                type="number"
+                value={netProfitAmount}
+                onChange={(e) => setNetProfitAmount(e.target.value)}
+                 min="0"
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              Transport Charges:
+              <input
+                type="number"
+                value={transportChargesAmount}
+                onChange={(e) => setTransportChargesAmount(e.target.value)}
+                 min="0"
+              />
+            </label>
+          </div>
+          <h3>Fabrication Charges</h3>
+          <div>
+            <label>
+              Unit:
+              <input
+                type="text"
+                value={fabricationChargesUnit}
+                onChange={(e) => setFabricationChargesUnit(e.target.value)}
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              Quantity:
+              <input
+                type="number"
+                value={fabricationChargesQuantity}
+                onChange={(e) => setFabricationChargesQuantity(e.target.value)}
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              Rate:
+              <input
+                type="number"
+                value={fabricationChargesRate}
+                onChange={(e) => setFabricationChargesRate(e.target.value)}
+                 min="0"
+              />
+            </label>
+          </div>
         </div>
 
         <h3>Items</h3>
@@ -285,19 +507,7 @@ function QuotationGenerator() {
                   name="wpm"
                   value={item.wpm}
                   onChange={(e) => handleInputChange(index, e)}
-                  placeholder="Enter Weight per miter"
-                  required
-                />
-              </div>
-
-              <div>
-                <label>Quantity:</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={item.quantity}
-                  onChange={(e) => handleInputChange(index, e)}
-                  min="1"
+                  placeholder="Enter Weight"
                 />
               </div>
               <div>
@@ -311,10 +521,21 @@ function QuotationGenerator() {
                 />
               </div>
               <div>
+                <label>Quantity:</label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={item.quantity}
+                  onChange={(e) => handleInputChange(index, e)}
+                  min="1"
+                />
+              </div>
+
+              <div>
                 <label>Total kg</label>
                 <input type="text" value={item.totalKg} readOnly />
               </div>
-           
+
               <div>
                 <label>Rate:</label>
                 <input
@@ -327,9 +548,6 @@ function QuotationGenerator() {
                   required
                 />
               </div>
-
-             
-
               <div>
                 <label></label>
                 <input type="text" value={item.amount} readOnly />
@@ -350,9 +568,19 @@ function QuotationGenerator() {
         <button className="add-button" type="button" onClick={addItem}>
           Add Item
         </button>
-        <br />
-        <br />
-
+        <div className="total-amount">
+          <h3>Total Amount: ₹{calculateTotal().toFixed(2)}</h3>
+        </div>
+        <div>
+          <label>Note for per Square feet </label>
+          <input
+            type="text"
+            name="rate"
+            value={sfAmount}
+            onChange={(e) => setSfAmount(e.target.value)}
+            
+          />
+        </div>
         <button className="generate-button" type="submit">
           Generate Quotation
         </button>
