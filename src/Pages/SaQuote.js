@@ -13,6 +13,7 @@ function QuotationGenerator() {
   const [note, setNote] = useState("");
   const [address, setAddress] = useState("");
   const [fabricationExpenseAmount, setFabricationExpenseAmount] = useState("");
+  const [project, setProject] = useState("");
   const [sfAmount, setSfAmount] = useState("");
   const [wastageAmount, setWastageAmount] = useState("");
   const [netProfitAmount, setNetProfitAmount] = useState("");
@@ -144,8 +145,8 @@ function QuotationGenerator() {
     doc.text(`Date: ${invoiceDate}`, 14, 58);
     doc.text(`Ref: ${name}`, 14, 63);
     doc.text(`${address}`, 20, 68);
-    doc.text(`Project:`, 20, 73);
-    doc.text(`Kind Attn Mr: ${attendName}`, 20, 78);
+    doc.text(`Project: ${project}`, 20, 78);
+    doc.text(`Kind Attn Mr: ${attendName}`, 20, 73);
     doc.text(`Quotation: ${quotainName}`, 20, 83);
     doc.text(
       `Dear Sir, with reference to the above subject, we are pleased to quote our rates as follows:`,
@@ -380,11 +381,21 @@ function QuotationGenerator() {
             <label> </label>
             <input
               type="text"
+              value={project}
+              onChange={(e) => setProject(e.target.value)}
+              placeholder="Enter Project "
+            />
+          </div>
+          <div>
+            <label> </label>
+            <input
+              type="text"
               value={attendName}
               onChange={(e) => setAttendName(e.target.value)}
               placeholder="Enter Attend Name "
             />
           </div>
+        
           <div>
             <label> </label>
             <input
@@ -395,7 +406,7 @@ function QuotationGenerator() {
             />
           </div>
           <div>
-            <label>Note </label>
+            <label>Description </label>
             <input
               type="text"
               value={note}
@@ -572,7 +583,7 @@ function QuotationGenerator() {
           <h3>Total Amount: ₹{calculateTotal().toFixed(2)}</h3>
         </div>
         <div>
-          <label>Note for per Square feet </label>
+          <label>Note for per Square feet/meter </label>
           <input
             type="text"
             name="rate"
