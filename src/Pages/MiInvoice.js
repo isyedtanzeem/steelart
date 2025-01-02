@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import "./Invoice.css";
 import "jspdf-autotable";
-import signature from "./Images/signature.png";
+import signature from "./Images/MIsignature.png";
 import logo from "./Images/saLogo.png";
 import { ToWords } from "to-words";
 
@@ -78,29 +78,29 @@ function InvoiceGenerator() {
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    doc.addImage(logo, "PNG", 14, 12, 30, 30);
+    // doc.addImage(logo, "PNG", 14, 12, 30, 30);
 
     doc.setFontSize(40);
-    doc.setTextColor(237, 104, 2);
+    doc.setTextColor(0, 64, 3);
     doc.setFont("helvetica", "bold");
-    doc.text("STEEL ART", 64, 28); // Company Name
+    doc.text("MISBA ENTERPRISES", 32, 28); // Company Name
     doc.setTextColor(0, 0, 0);
     doc.setFont("calibri", "none");
 
     doc.setFontSize(9);
     doc.text(
-      "Ground Floor, 240/2, Amalodbhava Nagara, Begur Main Road, Bengaluru - 560068",
-      54,
+      "Ground Floor, No. 6/17/9, Muneer mandir !2th Cross,Kaveri nagar,Hongasandra Bommanahalli, Bengaluru",
+      38,
       34
     ); // Company Address
-    doc.text("GST No: 29AALPZ8892L1Z8", 64, 40); // Company GST No
-    doc.text("Mobile: +91 9900 693 336", 122, 40); // Company Mobile No
+    doc.text("GST No: 29AALPZ8892L2Z7", 64, 40); // Company GST No
+    doc.text("Mobile: +91 8073 761 599", 122, 40); // Company Mobile No
     doc.line(14, 50, 200, 50);
 
     // Adding Invoice Title
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text(`Tax Invoice`, 98, 48);
+    doc.text(`Tax Invoice`, 90, 48);
 
     // Invoice Details
     doc.setFontSize(10);
@@ -173,7 +173,7 @@ doc.autoTable({
   startY: 106,
   theme: "grid",
   headStyles: {
-    fillColor: [237, 104, 2], // Blue background for header
+    fillColor: [0, 64, 3], // Blue background for header
     textColor: [255, 255, 255], // White text for header
     fontSize: 9, // Header font size
   },
@@ -307,14 +307,14 @@ doc.text(
     doc.text("Bank Account Details:", 14, doc.lastAutoTable.finalY + 48);
     doc.setFont("helvetica", "none");
     doc.text("Kotak Mahindra Bank", 14, doc.lastAutoTable.finalY + 54);
-    doc.text("A/C No: 8073761599", 14, doc.lastAutoTable.finalY + 58);
+    doc.text("A/C No: 8846151023", 14, doc.lastAutoTable.finalY + 58);
     doc.text("IFSC  : KKBK0008057", 14, doc.lastAutoTable.finalY + 62);
     doc.text("Branch: BOMMANAHALLI", 14, doc.lastAutoTable.finalY + 66);
 
-    doc.setTextColor(50, 86, 168); // Set text color to RGB (237, 104, 2)
+    doc.setTextColor(50, 86, 168); // Set text color to RGB (0, 64, 3)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13); // Set font size to 14
-    doc.text("For Steel Art", 96, doc.lastAutoTable.finalY + 48);
+    doc.text("For Misba Enterprises", 80, doc.lastAutoTable.finalY + 48);
     doc.addImage(signature, "PNG", 92, doc.lastAutoTable.finalY + 50, 40, 20);
     doc.setFont("helvetica", "none");
 
@@ -323,7 +323,7 @@ doc.text(
     doc.text("Receiver's Signature", 155, doc.lastAutoTable.finalY + 66);
 
     // Saving PDF
-    doc.save(`SaInvoice-${invoiceNumber}.pdf`);
+    doc.save(`Invoice-${invoiceNumber}.pdf`);
   };
 
   const handleSubmit = (e) => {
@@ -454,20 +454,7 @@ doc.text(
               placeholder="Enter Address"
             />
           </div>
-          {/* <div>
-          <label> </label>
-            <input
-              type="text"
-              value={shippedGST}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "" || value.length <= 15) {
-                  setShippedGST(value); // Update only if value is empty or 15 characters or less
-                }
-              }}
-              placeholder="Enter Customer GST No (15 characters)"
-            />
-          </div> */}
+         
         </div>
 
         <div className="input-group">

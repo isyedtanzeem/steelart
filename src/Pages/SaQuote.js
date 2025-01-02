@@ -15,6 +15,8 @@ function QuotationGenerator() {
   const [fabricationExpenseAmount, setFabricationExpenseAmount] = useState("");
   const [project, setProject] = useState("");
   const [sfAmount, setSfAmount] = useState("");
+    const [measurement, setMeasurement] = useState("");
+  
   const [wastageAmount, setWastageAmount] = useState("");
   const [netProfitAmount, setNetProfitAmount] = useState("");
   const [transportChargesAmount, setTransportChargesAmount] = useState("");
@@ -226,7 +228,6 @@ const fixedRows = [
     "Fabrication Charges",
     "",
     fabricationChargesUnit || "",
-    "",
     fabricationChargesQuantity || "",
     "",
     fabricationChargesRate
@@ -344,7 +345,8 @@ doc.autoTable({
       },
     });
     const inWords = toWords.convert(totalAmount);
-    doc.text(`${sfAmount}`, 14, doc.lastAutoTable.finalY + -2);
+    doc.text(`${measurement}`, 14, doc.lastAutoTable.finalY + -2);
+    doc.text(`${sfAmount}`, 14, doc.lastAutoTable.finalY + 3);
     doc.text(`In Words: ${inWords}`, 14, doc.lastAutoTable.finalY + 12);
 
     // Footer Section
@@ -613,6 +615,15 @@ doc.autoTable({
         
         <div className="total-amount">
           <h3>Total Amount: ₹{calculateTotal().toFixed(2)}</h3>
+        </div>
+        <div>
+          <label>Measurement </label>
+          <input
+            type="text"
+            name="measurement"
+            value={measurement}
+            onChange={(e) => setMeasurement(e.target.value)}
+          />
         </div>
         <div>
           <label>Note for per Square feet/meter </label>

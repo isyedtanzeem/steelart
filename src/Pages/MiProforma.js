@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import "./Invoice.css";
 import "jspdf-autotable";
-import signature from "./Images/signature.png";
+import signature from "./Images/MIsignature.png";
 import logo from "./Images/saLogo.png";
 import { ToWords } from "to-words";
 
@@ -71,23 +71,23 @@ function ProformaGenerator() {
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    doc.addImage(logo, "PNG", 14, 12, 30, 30);
+    // doc.addImage(logo, "PNG", 14, 12, 30, 30);
 
     doc.setFontSize(40);
-    doc.setTextColor(0, 73, 182);
+    doc.setTextColor(102, 0, 51);
     doc.setFont("helvetica", "bold");
-    doc.text("STEEL ART", 64, 28); // Company Name
+    doc.text("MISBA ENTERPRISES", 32, 28); // Company Name
     doc.setTextColor(0, 0, 0);
     doc.setFont("calibri", "none");
 
     doc.setFontSize(9);
     doc.text(
-      "Ground Floor, 240/2, Amalodbhava Nagara, Begur Main Road, Bengaluru - 560068",
-      54,
+      "Ground Floor, No. 6/17/9, Muneer mandir !2th Cross,Kaveri nagar,Hongasandra Bommanahalli, Bengaluru",
+      38,
       34
     ); // Company Address
-    doc.text("GST No: 29AALPZ8892L1Z8", 64, 40); // Company GST No
-    doc.text("Mobile: +91 9900 693 336", 122, 40); // Company Mobile No
+    doc.text("GST No: 29AALPZ8892L2Z7", 64, 40); // Company GST No
+    doc.text("Mobile: +91 8073 761 599", 122, 40); // Company Mobile No
     doc.line(14, 50, 200, 50);
 
     // Adding Proforma Title
@@ -113,11 +113,11 @@ function ProformaGenerator() {
     doc.text(`E-Way Bill No: ${ewayBill}`, 130, 56);
     doc.text(`Vehicle No: ${vehicleNo.toLocaleUpperCase()}`, 130, 62);
     doc.line(14, 70, 200, 70);
-    doc.text(`Details of Consignee (Billed To)`, 15, 75);
+    doc.text(`Details of Consignee (Delivered To)`, 15, 75);
  
     doc.line(14, 78, 200, 78);
 
-    //Billed To
+    //Delivered To
     doc.text(`Name: ${name}`, 14, 83);
     doc.text(`Mobile: ${mobile}`, 14, 88);
     // Address with wrapping
@@ -158,7 +158,7 @@ doc.autoTable({
   startY: 106,
   theme: "grid",
   headStyles: {
-    fillColor: [0, 73, 182], // Blue background for header
+    fillColor: [102, 0, 51], // Blue background for header
     textColor: [255, 255, 255], // White text for header
     fontSize: 9, // Header font size
   },
@@ -289,18 +289,19 @@ doc.text(
       doc.lastAutoTable.finalY + 42
     );
 
-    doc.setTextColor(0, 73, 182); // Set text color to RGB (237, 104, 2)
+    doc.setTextColor(102, 0, 51); // Set text color to RGB (237, 104, 2)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13); // Set font size to 14
-    doc.text("For Steel Art", 22, doc.lastAutoTable.finalY + 48);
-    doc.addImage(signature, "PNG", 20, doc.lastAutoTable.finalY + 50, 40, 20);
+    doc.text("For MISBA ENTERPRISES", 22, doc.lastAutoTable.finalY + 48);
+    doc.addImage(signature, "PNG", 28
+      , doc.lastAutoTable.finalY + 50, 40, 20);
     doc.setFont("helvetica", "none");
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10); // Set font size to 14
     doc.text("Receiver's Signature", 155, doc.lastAutoTable.finalY + 66);
 
     // Saving PDF
-    doc.save(`SaProforma-${proformaNumber}.pdf`);
+    doc.save(`Proforma-${proformaNumber}.pdf`);
   };
 
   const handleSubmit = (e) => {

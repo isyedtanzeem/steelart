@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import "./Invoice.css";
 import "jspdf-autotable";
-import signature from "./Images/signature.png";
+import signature from "./Images/MIsignature.png";
 import logo from "./Images/Logo2.png";
 import { ToWords } from "to-words";
 
@@ -79,20 +79,20 @@ function DCGenerator() {
     // doc.addImage(logo, "PNG", 14, 12, 30, 30);
 
     doc.setFontSize(40);
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(34, 0, 64);
     doc.setFont("helvetica", "bold");
-    doc.text("MISBA ENTERPRISES", 58, 28); // Company Name
+    doc.text("MISBA ENTERPRISES", 32, 28); // Company Name
     doc.setTextColor(0, 0, 0);
     doc.setFont("calibri", "none");
 
     doc.setFontSize(9);
     doc.text(
-      "Ground Floor, No 6/17/9, Muneer AMndir, 12th Cross Kaveri nagar, Hongasnadra, Bommanahalli, Bengaluru",
-      44,
+      "Ground Floor, No 6/17/9, Muneer Mandir, 12th Cross Kaveri nagar, Hongasnadra, Bommanahalli, Bengaluru",
+      38,
       34
     ); // Company Address
-    doc.text("GST No: 29AALPZ8892L1Z8", 64, 40); // Company GST No
-    doc.text("Mobile: +91 9900 693 336", 122, 40); // Company Mobile No
+    doc.text("GST No: 29AALPZ8892L2Z7", 64, 40); // Company GST No
+    doc.text("Mobile: +91 8073 761 599", 122, 40); // Company Mobile No
     doc.line(14, 50, 200, 50);
 
     // Adding DC Title
@@ -118,11 +118,11 @@ function DCGenerator() {
     doc.text(`E-Way Bill No: ${ewayBill}`, 130, 56);
     doc.text(`Vehicle No: ${vehicleNo.toLocaleUpperCase()}`, 130, 62);
     doc.line(14, 70, 200, 70);
-    doc.text(`Details of Consignee (Billed To)`, 15, 75);
+    doc.text(`Details of Consignee (Delivered To)`, 15, 75);
 
     doc.line(14, 78, 200, 78);
 
-    //Billed To
+    //Delivered To
     doc.text(`Name: ${name}`, 14, 83);
     doc.text(`Mobile: ${mobile}`, 14, 88);
     // Address with wrapping
@@ -161,7 +161,7 @@ function DCGenerator() {
       startY: 106,
       theme: "grid",
       headStyles: {
-        fillColor: [0, 0, 0], // Blue background for header
+        fillColor: [34, 0, 64], // Blue background for header
         textColor: [255, 255, 255], // White text for header
         fontSize: 9, // Header font size
       },
@@ -291,10 +291,10 @@ function DCGenerator() {
       doc.lastAutoTable.finalY + 42
     );
 
-    doc.setTextColor(0, 0, 0); // Set text color to RGB (237, 104, 2)
+    doc.setTextColor(34, 0, 64); // Set text color to RGB (237, 104, 2)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13); // Set font size to 14
-    doc.text("For Misbah", 22, doc.lastAutoTable.finalY + 48);
+    doc.text("For Misba Enterprises", 22, doc.lastAutoTable.finalY + 48);
     doc.addImage(signature, "PNG", 20, doc.lastAutoTable.finalY + 50, 40, 20);
     doc.setFont("helvetica", "none");
 
@@ -355,7 +355,7 @@ function DCGenerator() {
 
         <div className="input-group">
           <label style={{ fontWeight: "bold", fontSize: "20px" }}>
-            Billed To
+            Delivered To
           </label>
           <div>
             <input

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import "./Invoice.css";
 import "jspdf-autotable";
-import signature from "./Images/signature.png";
+import signature from "./Images/MIsignature.png";
 import logo from "./Images/Logo3.png";
 import { ToWords } from "to-words";
 
@@ -14,6 +14,7 @@ function QuotationGenerator() {
   const [address, setAddress] = useState("");
   const [fabricationExpenseAmount, setFabricationExpenseAmount] = useState("");
   const [project, setProject] = useState("");
+  const [measurement, setMeasurement] = useState("");
   const [sfAmount, setSfAmount] = useState("");
   const [wastageAmount, setWastageAmount] = useState("");
   const [netProfitAmount, setNetProfitAmount] = useState("");
@@ -121,18 +122,18 @@ function QuotationGenerator() {
     // doc.addImage(logo, "PNG", 14, 12, 30, 30);
     doc.setFontSize(40);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(1, 84, 7);
-    doc.text("MISBA ENTERPRISE", 58, 28);
+    doc.setTextColor(0, 0, 102);
+    doc.text("MISBA ENTERPRISES", 32, 28);
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "none");
     doc.setFontSize(9);
     doc.text(
       "Ground Floor, No. 6/17/9, Muneer mandir !2th Cross,Kaveri nagar,Hongasandra Bommanahalli, Bengaluru",
-      40,
+      38,
       34
     );
-    doc.text("GST No: 29AALPZ8892L1Z8", 64, 40);
-    doc.text("Mobile: +91 9900 693 336", 122, 40);
+    doc.text("GST No: 29AALPZ8892L2Z7", 64, 40);
+    doc.text("Mobile: +91 8073 761 599", 122, 40);
     doc.line(14, 50, 200, 50);
 
     // Quotation Title
@@ -226,7 +227,6 @@ const fixedRows = [
     "Fabrication Charges",
     "",
     fabricationChargesUnit || "",
-    "",
     fabricationChargesQuantity || "",
     "",
     fabricationChargesRate
@@ -277,7 +277,7 @@ doc.autoTable({
   startY: 94,
   theme: "grid",
   headStyles: {
-    fillColor: [1, 84, 7],
+    fillColor: [0, 0, 102],
     textColor: [255, 255, 255],
     fontSize: 9,
     halign: "center",
@@ -312,7 +312,7 @@ doc.autoTable({
       startY: 94,
       theme: "grid",
       headStyles: {
-        fillColor: [1, 84, 7],
+        fillColor: [0, 0, 102],
         textColor: [255, 255, 255],
         fontSize: 9,
         halign: "center",
@@ -344,7 +344,8 @@ doc.autoTable({
       },
     });
     const inWords = toWords.convert(totalAmount);
-    doc.text(`${sfAmount}`, 14, doc.lastAutoTable.finalY + -2);
+    doc.text(`${measurement}`, 14, doc.lastAutoTable.finalY + -2);
+    doc.text(`${sfAmount}`, 14, doc.lastAutoTable.finalY + 3);
     doc.text(`In Words: ${inWords}`, 14, doc.lastAutoTable.finalY + 12);
 
     // Footer Section
@@ -362,8 +363,8 @@ doc.autoTable({
     doc.text(`${note}`, 24, doc.lastAutoTable.finalY + 26);
 
     doc.setFontSize(13);
-    doc.text("For Misba Enterprises", 162, doc.lastAutoTable.finalY + 22);
-    doc.addImage(signature, "PNG", 160, doc.lastAutoTable.finalY + 24, 40, 20);
+    doc.text("For Misba Enterprises", 140, doc.lastAutoTable.finalY + 22);
+    doc.addImage(signature, "PNG", 145, doc.lastAutoTable.finalY + 24, 40, 20);
 
     doc.save(`Quote-${name}.pdf`);
   };
@@ -613,6 +614,15 @@ doc.autoTable({
         
         <div className="total-amount">
           <h3>Total Amount: ₹{calculateTotal().toFixed(2)}</h3>
+        </div>
+        <div>
+          <label>Measurement </label>
+          <input
+            type="text"
+            name="rate"
+            value={measurement}
+            onChange={(e) => setMeasurement(e.target.value)}
+          />
         </div>
         <div>
           <label>Note for per Square feet/meter </label>

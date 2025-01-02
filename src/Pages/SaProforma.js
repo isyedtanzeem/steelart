@@ -113,11 +113,11 @@ function ProformaGenerator() {
     doc.text(`E-Way Bill No: ${ewayBill}`, 130, 56);
     doc.text(`Vehicle No: ${vehicleNo.toLocaleUpperCase()}`, 130, 62);
     doc.line(14, 70, 200, 70);
-    doc.text(`Details of Consignee (Billed To)`, 15, 75);
+    doc.text(`Details of Consignee (Delivered To)`, 15, 75);
  
     doc.line(14, 78, 200, 78);
 
-    //Billed To
+    //Delivered To
     doc.text(`Name: ${name}`, 14, 83);
     doc.text(`Mobile: ${mobile}`, 14, 88);
     // Address with wrapping
