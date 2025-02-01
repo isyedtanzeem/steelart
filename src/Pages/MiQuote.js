@@ -143,7 +143,7 @@ function QuotationGenerator() {
 
     // Quotation Details
     doc.setFontSize(10);
-    doc.text(`Date: ${invoiceDate}`, 14, 58);
+    doc.text(`Date: ${invoiceDate.split('-').reverse().join('-')}`, 14, 58);
     doc.text(`Ref: ${name}`, 14, 63);
     doc.text(`${address}`, 20, 68);
     doc.text(`Project: ${project}`, 20, 78);
@@ -491,6 +491,7 @@ doc.autoTable({
                   value={item.quantity}
                   onChange={(e) => handleInputChange(index, e)}
                   min="1"
+                  step="any"
                 />
               </div>
 

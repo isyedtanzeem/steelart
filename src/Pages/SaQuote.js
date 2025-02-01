@@ -27,15 +27,34 @@ function QuotationGenerator() {
     useState("");
   const [fabricationChargesRate, setFabricationChargesRate] = useState("");
 
-  const getCurrentDate = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    return `${dd}/${mm}/${yyyy}`;
-  };
+  // const getCurrentDate = () => {
+  //   const today = new Date();
+  //   const yyyy = today.getFullYear();
+  //   const mm = String(today.getMonth() + 1).padStart(2, "0");
+  //   const dd = String(today.getDate()).padStart(2, "0");
+  //   return `${dd}/${mm}/${yyyy}`;
+  // };
 
-  const [invoiceDate, setInvoiceDate] = useState(getCurrentDate());
+  const getCurrentDate = () => {
+    const date = new Date();
+    return date.toLocaleDateString('en-GB'); // dd/mm/yyyy format
+};
+
+
+
+
+const [invoiceDate, setInvoiceDate] = useState(() => {
+  const today = new Date();
+  return today.toISOString().split('T')[0]; // Default to 'yyyy-mm-dd' for input[type="date"]
+});
+
+const handleDateChange = (e) => {
+  const inputDate = e.target.value; // Format is 'yyyy-mm-dd'
+  const [year, month, day] = inputDate.split("-");
+  const formattedDate = `${day}-${month}-${year}`; // Convert to 'dd-mm-yyyy'
+  setInvoiceDate(formattedDate);
+};
+
 
   const [items, setItems] = useState([
     { description: "", quantity: 1, wpm: "", totalKg: 0, rate: "", amount: 0, unit: "" },
@@ -144,7 +163,7 @@ function QuotationGenerator() {
 
     // Quotation Details
     doc.setFontSize(10);
-    doc.text(`Date: ${invoiceDate}`, 14, 58);
+    doc.text(`Date: ${invoiceDate.split('-').reverse().join('-')}`, 14, 58);
     doc.text(`Ref: ${name}`, 14, 63);
     doc.text(`${address}`, 20, 68);
     doc.text(`Project: ${project}`, 20, 78);
@@ -384,12 +403,15 @@ doc.autoTable({
         <div className="input-group">
           <div>
             <label>Date:</label>
-            <input
-              type="date"
-              value={invoiceDate}
-              onChange={(e) => setInvoiceDate(e.target.value)}
-              required
-            />
+            <input 
+    type="date" 
+    value={invoiceDate} 
+    onChange={(e) => {
+        setInvoiceDate(e.target.value); // Keep 'yyyy-mm-dd' in state
+    }} 
+/>
+<p>Selected Date: {invoiceDate.split('-').reverse().join('-')}</p> {/* Show 'dd-mm-yyyy' */}
+
           </div>
         </div>
 
@@ -492,6 +514,7 @@ doc.autoTable({
                   value={item.quantity}
                   onChange={(e) => handleInputChange(index, e)}
                   min="1"
+                  step="any"
                 />
               </div>
 
